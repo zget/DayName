@@ -3,32 +3,29 @@ package com.gech.demo.Controller;
 
 
 import com.gech.demo.Model.*;
+import com.gech.demo.Service.DateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
-
-import static com.gech.demo.Model.BirthDate.dTF;
+import java.util.Calendar;
+import java.util.Date;
 
 
 @Controller
 public class HomeController {
 
 
-@Autowired
-AppUserRepository userRepository;
-
-@Autowired
-AppRoleRepository roleRepository;
+    @Autowired
+    DateService myservice;
 
 
-@Autowired
-    BirthdateRepository dobRepo;
 
 
     @GetMapping("/addbirthday")
@@ -40,43 +37,56 @@ AppRoleRepository roleRepository;
     }
 
     @PostMapping("/addbirthday")
-    public String processBirthDay(@Valid @ModelAttribute("bdate") BirthDate userinput, BindingResult result,
-                                  HttpServletRequest request){
+    public String processBirthDay(@Valid @ModelAttribute("bdate") BirthDate birthDate, BindingResult result,
+                                  HttpServletRequest request, Model model){
         if(result.hasErrors()){
             return "birthdayform";
         }
 
+        System.out.println(birthDate.getDob());
 
-        do{
-            System.out.println("Enter a date in the past(dd/mm/yyyy)");
-            try{
+        myservice.findDay(birthDate);
 
-                 userinput.setDob(LocalDate.parse(request.getParameter("userInput"),dTF));
-                // bdate.getDob();
+        int m=myservice.getMonth(birthDate.getDob());
+        int d=myservice.getDay(birthDate.getDob());
 
-            }catch(Exception e)
-            {
-                if(userinput.getDob().isAfter(LocalDate.now())&&userinput.getDob()!=null)
-                    System.out.println("The date must be in the past");
+        myservice.saveBirthDate(birthDate);
 
-                System.out.println("Unable to convert the string you entered to date. Please try again!");
+//        model.addAttribute("bd", myservice.saveBirthDate(birthDate));
+        String myZodiac= myservice.getZodiac(m,d);
 
-            }
+        System.out.println(myZodiac);
 
-        }while(userinput==null);
+//        do{
+//            System.out.println("Enter a date in the past(dd/mm/yyyy)");
+//            try{
+//
+//                 userinput.setDob(LocalDate.parse(request.getParameter("userInput"),dTF));
+//                // bdate.getDob();
+//
+//            }catch(Exception e)
+//            {
+//                if(userinput.getDob().isAfter(Date.now())&&userinput.getDob()!=null)
+//                    System.out.println("The date must be in the past");
+//
+//                System.out.println("Unable to convert the string you entered to date. Please try again!");
+//
+//            }
+//
+//        }while(userinput==null);
 
         //Display the date entered
-        System.out.println(userinput.getDob().format(dTF));
-        System.out.println(userinput.getDob().getDayOfWeek());
+//        System.out.println(userinput.getDob());
+////        System.out.println(userinput.getDayOfWeek());
+//
 
-        dobRepo.save(userinput);
     return "redirect:/list";
     }
 
     @RequestMapping("/list")
     public String list(Model model){
 
-        model.addAttribute("bdate", dobRepo.findAll());
+        model.addAttribute("bdate",myservice.findallBirtdays());
         return "list";
     }
 
@@ -118,13 +128,24 @@ AppRoleRepository roleRepository;
             return "Registration";
         }
 
-        user.addRole(roleRepository.findAppRoleByRoleName("USER"));
-        userRepository.save(user);
+        user.addRole(myservice.findRole("USER"));
+        myservice.saveUser(user);
         model.addAttribute("message", "User account Successfully Created");
         return "redirect:/login";
     }
 
 
+
+    @GetMapping("/libra")
+    public @ResponseBody String showLibra(){
+
+
+        RestTemplate restTemplate= new RestTemplate();
+
+        Libra libra=restTemplate.getForObject("http://horoscope-api.herokuapp.com/horoscope/today/Libra",Libra.class);
+        return libra.getHoroscope() ;
+
+    }
 
 
 }

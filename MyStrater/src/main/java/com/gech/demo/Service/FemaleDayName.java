@@ -1,5 +1,6 @@
 package com.gech.demo.Service;
 
+
 public final class FemaleDayName {
 
     public static final String Monday = "Adjoa";

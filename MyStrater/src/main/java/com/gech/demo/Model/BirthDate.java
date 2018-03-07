@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Entity
 public class BirthDate {
@@ -13,16 +14,15 @@ public class BirthDate {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Transient
     private LocalDate dob;
 
+//    DateTimeFormatter dTF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-
-  public static final DateTimeFormatter dTF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-
-
+    private String  weekday;
+   private String femalename;
+    private String malename;
 
     public BirthDate() {
     }
@@ -43,5 +43,27 @@ public class BirthDate {
         this.dob = dob;
     }
 
+    public String getWeekday() {
+        return weekday;
+    }
 
+    public void setWeekday(String weekday) {
+        this.weekday = weekday;
+    }
+
+    public String getFemalename() {
+        return femalename;
+    }
+
+    public void setFemalename(String femalename) {
+        this.femalename = femalename;
+    }
+
+    public String getMalename() {
+        return malename;
+    }
+
+    public void setMalename(String malename) {
+        this.malename = malename;
+    }
 }

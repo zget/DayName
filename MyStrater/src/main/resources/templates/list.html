@@ -31,6 +31,8 @@
     <tr>
         <th class="text-left">birth date</th>
         <th class="text-left">birth day</th>
+        <th class="text-left">Female Name</th>
+        <th class="text-left">Male Name</th>
 
 
 
@@ -40,7 +42,9 @@
     <tr th:inline="text" th:each="bd : ${bdate}">
 
         <td th:inline="text" class="text-left">[[${bd.getDob()}]]</td>
-        <td th:inline="text" class="text-left">[[${bd.getDob().getDayOfWeek()}]]</td>
+        <td th:inline="text" class="text-left">[[${bd.getWeekday()}]]</td>
+        <td th:inline="text" class="text-left">[[${bd.getFemalename()}]]</td>
+        <td th:inline="text" class="text-left">[[${bd.getMalename()}]]</td>
 
     </tr>
 
